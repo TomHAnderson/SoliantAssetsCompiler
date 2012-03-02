@@ -1,8 +1,13 @@
-This is a tiny module which copies all files in each module's /public directory to the common ~/public/assets directory _which must be writable_.
+This is a Zend Framework 2 Module.
 
-So your module is ~/modules/MyModule Create ~/modules/MyModule/public and put .js, .css, .png, .mov files in and organize externals by module.
+AssetsCompiler is a tiny module which copies all files in each module's /public directory to the common ~/public/assets directory _which must be writable_.
 
-You then continue to use the same /assets/ModuleName/file.ext to include files in a page.  Other asset modules use this same schema and you may find them more useful than this during development but using this at the time of release will make your application sing.
+So your module is ~/modules/MyModule 
+Create ~/modules/MyModule/public and put .js, .css, .png, .mov, .cdr files in and organize externals by module.
+
+You then continue to use the same /assets/ModuleName/file.ext to include files in a page.  Other asset modules
+use this same schema and you may find them more useful than this during development but using this at the time 
+of release will make your application sing.
 
 An html page would reference such external as <img src="/assets/Application/logo.gif">
 
