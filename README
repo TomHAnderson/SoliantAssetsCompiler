@@ -5,3 +5,5 @@ So your module is ~/modules/MyModule Create ~/modules/MyModule/public and put .j
 You then continue to use the same /assets/ModuleName/file.ext to include files in a page.  Other asset modules use this same schema and you may find them more useful than this during development but using this at the time of release will make your application sing.
 
 An html page would reference such external as <img src="/assets/Application/logo.gif">
+
+The assets pattern in ZF2 has been established as ~module/public and ~/public/assets and no further configuration of a ZF2 app derived from the skeleton is necessary.
