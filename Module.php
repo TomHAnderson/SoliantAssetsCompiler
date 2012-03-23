@@ -7,7 +7,7 @@
  * @version 1.0
  */
 
-namespace AssetsCompiler;
+namespace SoliantAssetsCompiler;
 
 use Zend\Module\Manager,
     Zend\EventManager\StaticEventManager,
