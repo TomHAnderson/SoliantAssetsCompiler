@@ -31,6 +31,7 @@ class Module implements AutoloaderProvider
         $this->setModuleManager($moduleManager);
 
         $events = StaticEventManager::getInstance();
+        $events->attach('bootstrap', 'bootstrap', array($this, 'checkPaths'), 101);
         $events->attach('bootstrap', 'bootstrap', array($this, 'compileAssets'), 100);
 
     }
@@ -43,6 +44,56 @@ class Module implements AutoloaderProvider
     public function getConfig()
     {
         return array();
+    }
+
+    public function checkPaths($e) {
+#        $response = $e->getTarget()->getResponse();
+        $return = '';
+        $errors = array();
+
+        // Check directories
+        $checkDirs = array(
+            'Assets' => APPLICATION_PATH . '/public/assets/',
+        );
+        $return .= '<style>span.fail {color: red;}</style>';
+        $return .= "<h1>Soliant Assets Compiler</h1><pre>";
+
+        foreach ($checkDirs as $key => $checkDir) {
+            $return .= "Testing $key Directory\n";
+
+            // Directory testing from Smarty->testInstall();
+            if (!is_dir($checkDir)) {
+                $status = false;
+                $message = "<span class=\"fail\">FAILED</span>: {$checkDir} is not a directory";
+                $return .= $message . ".\n\n";
+                $errors['compile_dir'] = $message;
+            } elseif (!is_readable($checkDir)) {
+                $status = false;
+                $message = "<span class=\"fail\">FAILED</span>: {$checkDir} is not readable";
+                $return .= $message . ".\n\n";
+                $errors['compile_dir'] = $message;
+            } elseif (!is_writable($checkDir)) {
+                $status = false;
+                $message = "<span class=\"fail\">FAILED</span>: {$checkDir} is not writable";
+                $return .= $message . ".\n\n";
+                $errors['compile_dir'] = $message;
+            } else {
+                $return .= "{$checkDir} is OK.\n\n";
+            }
+
+        }
+        $return .= '</pre>
+            You must fix these errors to continue.
+        ';
+
+        if ($errors) {
+            die($return);
+#            $response->setContent($return);
+#            $e->stopPropagation();
+#            return $response;
+        }
+
+        return true;
     }
 
     public function compileAssets($e) {
