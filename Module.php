@@ -48,14 +48,10 @@ class Module
     protected function pathTo($module)
     {
         $clsName = $module . '\Module';
-        $ret = false;
-        if (class_exists($clsName, false)) {
-            $cls = new ReflectionClass($clsName);
-            $dir = dirname($cls->getFilename());
-            $path = array($dir, 'public');
-            $ret = realpath(implode(DIRECTORY_SEPARATOR, $path));
-        }
-        return $ret;
+        $class = new $clsName;
+        if (method_exists($class, 'getAssetsPath')) 
+            return $class->getAssetsPath();
+        return false;
     }
 
     /**
