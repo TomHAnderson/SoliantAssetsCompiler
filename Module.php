@@ -9,12 +9,10 @@
 
 namespace SoliantAssetsCompiler;
 
-use Zend\Module\Manager,
-    Zend\EventManager\StaticEventManager,
-    Zend\Module\Consumer\AutoloaderProvider,
+use Zend\ModuleManager\ModuleManager,
     ReflectionClass;
 
-class Module implements AutoloaderProvider
+class Module
 {
     private $moduleManager;
 
@@ -22,23 +20,13 @@ class Module implements AutoloaderProvider
         return $this->moduleManager;
     }
 
-    public function setModuleManager(Manager $moduleManager) {
+    public function setModuleManager(ModuleManager $moduleManager) {
         $this->moduleManager = $moduleManager;
     }
 
-    public function init(Manager $moduleManager)
+    public function init(ModuleManager $moduleManager)
     {
         $this->setModuleManager($moduleManager);
-
-        $events = StaticEventManager::getInstance();
-        $events->attach('bootstrap', 'bootstrap', array($this, 'checkPaths'), 101);
-        $events->attach('bootstrap', 'bootstrap', array($this, 'compileAssets'), 100);
-
-    }
-
-    public function getAutoloaderConfig()
-    {
-        return array();
     }
 
     public function getConfig()
@@ -46,57 +34,7 @@ class Module implements AutoloaderProvider
         return array();
     }
 
-    public function checkPaths($e) {
-#        $response = $e->getTarget()->getResponse();
-        $return = '';
-        $errors = array();
-
-        // Check directories
-        $checkDirs = array(
-            'Assets' => APPLICATION_PATH . '/public/assets/',
-        );
-        $return .= '<style>span.fail {color: red;}</style>';
-        $return .= "<h1>Soliant Assets Compiler</h1><pre>";
-
-        foreach ($checkDirs as $key => $checkDir) {
-            $return .= "Testing $key Directory\n";
-
-            // Directory testing from Smarty->testInstall();
-            if (!is_dir($checkDir)) {
-                $status = false;
-                $message = "<span class=\"fail\">FAILED</span>: {$checkDir} is not a directory";
-                $return .= $message . ".\n\n";
-                $errors['compile_dir'] = $message;
-            } elseif (!is_readable($checkDir)) {
-                $status = false;
-                $message = "<span class=\"fail\">FAILED</span>: {$checkDir} is not readable";
-                $return .= $message . ".\n\n";
-                $errors['compile_dir'] = $message;
-            } elseif (!is_writable($checkDir)) {
-                $status = false;
-                $message = "<span class=\"fail\">FAILED</span>: {$checkDir} is not writable";
-                $return .= $message . ".\n\n";
-                $errors['compile_dir'] = $message;
-            } else {
-                $return .= "{$checkDir} is OK.\n\n";
-            }
-
-        }
-        $return .= '</pre>
-            You must fix these errors to continue.
-        ';
-
-        if ($errors) {
-            die($return);
-#            $response->setContent($return);
-#            $e->stopPropagation();
-#            return $response;
-        }
-
-        return true;
-    }
-
-    public function compileAssets($e) {
+    public function onBootstrap($e) {
         foreach ($this->getModuleManager()->getModules() as $module) {
             if ($path = $this->pathTo($module)) {
                $this->copyr($path, __DIR__ . '/../../public/assets/' . $module);
@@ -167,3 +105,4 @@ class Module implements AutoloaderProvider
         return true;
     }
 }
+
